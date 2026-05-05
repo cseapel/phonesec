@@ -1,0 +1,278 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>PhoneSec — Catch apps in the act.</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet" />
+<style>
+  :root { --bg0:#050b16; --bg1:#0a1628; --fg:#e8f0ff;
+    --mute:rgba(232,240,255,.6); --accent:#3df0ff; --danger:#ff4757; --ok:#3df0a8; }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; background: var(--bg0); color: var(--fg);
+    font-family: 'Inter', system-ui, sans-serif; -webkit-font-smoothing: antialiased; overflow-x: hidden; }
+  .nav { position: sticky; top: 0; z-index: 50; padding: 18px 32px;
+    display: flex; align-items: center; justify-content: space-between;
+    backdrop-filter: blur(16px);
+    background: rgba(5,11,22,.7); border-bottom: 1px solid rgba(255,255,255,.06); }
+  .logo { display: flex; align-items: center; gap: 10px; font-weight: 700; font-size: 16px; letter-spacing: -.01em; }
+  .logo-dot { width: 28px; height: 28px; border-radius: 8px;
+    background: linear-gradient(135deg, #3df0ff 0%, #3d8aff 100%);
+    display: flex; align-items: center; justify-content: center; color: #0a1628; }
+  .nav-links { display: flex; gap: 28px; font-size: 13px; }
+  .nav-links a { color: var(--mute); text-decoration: none; }
+  .nav-links a:hover { color: var(--fg); }
+  .btn { display: inline-flex; align-items: center; gap: 8px;
+    padding: 11px 18px; border-radius: 10px; font-weight: 600; font-size: 14px;
+    cursor: pointer; text-decoration: none; border: 0; }
+  .btn-primary { background: linear-gradient(135deg, #3df0ff 0%, #3d8aff 100%);
+    color: #0a1628; box-shadow: 0 8px 24px rgba(61,240,255,.25); }
+  .btn-ghost { background: rgba(255,255,255,.04); color: var(--fg);
+    border: 1px solid rgba(255,255,255,.08); }
+
+  /* hero */
+  .hero { position: relative; padding: 100px 32px 80px; text-align: center; overflow: hidden; }
+  .hero::before { content: ''; position: absolute; inset: 0;
+    background:
+      radial-gradient(ellipse 60% 50% at 50% 0%, rgba(61,240,255,.18) 0%, transparent 60%),
+      radial-gradient(ellipse 40% 40% at 70% 60%, rgba(255,71,87,.12) 0%, transparent 60%);
+    pointer-events: none; }
+  .hero::after { content: ''; position: absolute; inset: 0; pointer-events: none;
+    background-image:
+      linear-gradient(rgba(61,240,255,.04) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(61,240,255,.04) 1px, transparent 1px);
+    background-size: 40px 40px;
+    mask-image: radial-gradient(ellipse 60% 60% at 50% 50%, #000 30%, transparent 80%); }
+  .hero-eyebrow { font: 700 12px/1 'JetBrains Mono', monospace;
+    letter-spacing: .2em; text-transform: uppercase; color: var(--accent);
+    display: inline-flex; align-items: center; gap: 8px; padding: 8px 14px;
+    border-radius: 100px; background: rgba(61,240,255,.1);
+    border: 1px solid rgba(61,240,255,.25); position: relative; z-index: 2; }
+  .hero-eyebrow::before { content: ''; width: 6px; height: 6px; border-radius: 50%;
+    background: var(--accent); box-shadow: 0 0 8px var(--accent);
+    animation: blink 1.4s ease-in-out infinite; }
+  @keyframes blink { 0%,100%{opacity:1} 50%{opacity:.3} }
+  .hero h1 { font-size: clamp(40px, 7vw, 88px); font-weight: 800;
+    letter-spacing: -.035em; line-height: 1; margin: 24px 0 20px;
+    position: relative; z-index: 2; }
+  .hero h1 em { font-style: normal; color: var(--danger);
+    background: linear-gradient(135deg, #ff4757 0%, #ff8c5c 100%);
+    -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent; }
+  .hero-sub { font-size: 18px; color: var(--mute); max-width: 600px;
+    margin: 0 auto 36px; line-height: 1.55; position: relative; z-index: 2; }
+  .hero-cta { display: inline-flex; gap: 12px; position: relative; z-index: 2; }
+
+  /* phone mock */
+  .hero-mock { position: relative; max-width: 360px; margin: 60px auto 0; z-index: 2; }
+  .phone {
+    width: 100%; aspect-ratio: 360/740; border-radius: 38px;
+    background: #050b16; border: 8px solid rgba(255,255,255,.1);
+    overflow: hidden; box-shadow: 0 50px 120px rgba(0,0,0,.6),
+                                  0 0 0 1px rgba(255,255,255,.04);
+    display: flex; flex-direction: column; padding: 14px;
+    background-image: linear-gradient(180deg, #0a1628 0%, #050b16 100%);
+  }
+  .ph-eyebrow { font: 700 9px/1 'JetBrains Mono', monospace;
+    letter-spacing: .14em; color: var(--accent); text-transform: uppercase; }
+  .ph-title { font-weight: 700; font-size: 18px; margin: 6px 0 14px; }
+  .ph-card { background: rgba(255,255,255,.03); border: 1px solid rgba(255,255,255,.06);
+    border-radius: 14px; padding: 14px; }
+  .ph-ring { width: 64px; height: 64px; border-radius: 50%;
+    background: conic-gradient(#3df0a8 0deg 230deg, rgba(255,255,255,.08) 230deg);
+    -webkit-mask: radial-gradient(circle, transparent 50%, #000 53%);
+            mask: radial-gradient(circle, transparent 50%, #000 53%); position: relative; }
+  .ph-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 6px; margin-top: 10px; }
+  .ph-tile { padding: 10px; border-radius: 10px; background: rgba(255,255,255,.025);
+    border: 1px solid rgba(255,255,255,.06); }
+  .ph-tile.live { background: rgba(255,71,87,.12); border-color: rgba(255,71,87,.35); color: var(--danger); }
+  .ph-tile.warn { background: rgba(255,181,71,.12); border-color: rgba(255,181,71,.35); color: #ffb547; }
+  .ph-lbl { font: 10px 'Inter'; color: rgba(232,240,255,.55); }
+  .ph-num { font: 700 18px/1 'JetBrains Mono', monospace; margin-top: 4px; }
+  .ph-bubble {
+    position: absolute; right: 30px; top: 130px;
+    width: 56px; height: 56px; border-radius: 50%;
+    background: linear-gradient(135deg, #ff4757, #c92741);
+    display: flex; align-items: center; justify-content: center;
+    color: #fff; box-shadow: 0 0 0 0 rgba(255,71,87,.55), 0 8px 32px rgba(255,71,87,.4);
+    animation: pulse-bubble 1.6s ease-out infinite; z-index: 3;
+  }
+  @keyframes pulse-bubble {
+    0%,100% { box-shadow: 0 0 0 0 rgba(255,71,87,.55), 0 8px 32px rgba(255,71,87,.4); }
+    50%     { box-shadow: 0 0 0 16px rgba(255,71,87,0), 0 8px 32px rgba(255,71,87,.4); }
+  }
+
+  /* features */
+  .features { padding: 100px 32px; max-width: 1100px; margin: 0 auto; }
+  .section-eyebrow { font: 700 11px/1 'JetBrains Mono', monospace;
+    letter-spacing: .2em; text-transform: uppercase; color: var(--accent); }
+  .section-h2 { font-size: clamp(32px, 4vw, 48px); font-weight: 700;
+    letter-spacing: -.025em; line-height: 1.05; margin: 14px 0 14px; max-width: 720px; }
+  .section-sub { color: var(--mute); font-size: 16px; max-width: 560px; line-height: 1.55; }
+  .feat-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 16px; margin-top: 56px; }
+  .feat { padding: 24px; border-radius: 16px;
+    background: rgba(255,255,255,.025); border: 1px solid rgba(255,255,255,.06); }
+  .feat-icon { width: 40px; height: 40px; border-radius: 10px;
+    background: rgba(61,240,255,.12); color: var(--accent);
+    display: flex; align-items: center; justify-content: center; margin-bottom: 16px; }
+  .feat h3 { font-size: 16px; font-weight: 600; margin: 0 0 6px; letter-spacing: -.01em; }
+  .feat p { color: var(--mute); font-size: 13.5px; line-height: 1.55; margin: 0; }
+
+  /* promise */
+  .promise { padding: 80px 32px; background:
+    linear-gradient(180deg, rgba(61,240,168,.04) 0%, transparent 100%); }
+  .promise-wrap { max-width: 800px; margin: 0 auto; text-align: center; }
+  .promise-list { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 12px; margin-top: 36px; }
+  .promise-item { padding: 18px; border-radius: 12px;
+    background: rgba(61,240,168,.06); border: 1px solid rgba(61,240,168,.2); }
+  .promise-item b { font: 700 10px/1 'JetBrains Mono', monospace;
+    letter-spacing: .14em; text-transform: uppercase; color: var(--ok); display: block; margin-bottom: 8px; }
+  .promise-item span { font-size: 13px; color: rgba(232,240,255,.75); }
+
+  /* CTA */
+  .cta { padding: 120px 32px; text-align: center; position: relative; }
+  .cta::before { content: ''; position: absolute; inset: 0;
+    background: radial-gradient(ellipse 50% 60% at 50% 50%, rgba(61,240,255,.12) 0%, transparent 60%); }
+  .cta-h { font-size: clamp(36px, 5vw, 64px); font-weight: 700;
+    letter-spacing: -.025em; line-height: 1.05; margin: 0 0 16px; position: relative; }
+  .cta-sub { color: var(--mute); font-size: 17px; margin: 0 0 32px; position: relative; }
+
+  footer { padding: 40px 32px; border-top: 1px solid rgba(255,255,255,.06);
+    display: flex; flex-wrap: wrap; gap: 16px; align-items: center; justify-content: space-between;
+    font-size: 12px; color: rgba(232,240,255,.45); font-family: 'JetBrains Mono', monospace; letter-spacing: .04em; }
+  footer a { color: rgba(232,240,255,.6); text-decoration: none; margin-left: 18px; }
+  footer a:hover { color: var(--fg); }
+</style>
+</head>
+<body>
+
+<nav class="nav">
+  <div class="logo">
+    <div class="logo-dot">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M12 3l8 3v6c0 5-3.5 8.5-8 9-4.5-.5-8-4-8-9V6z"/><path d="M9 12l2 2 4-4"/>
+      </svg>
+    </div>
+    PhoneSec
+  </div>
+  <div class="nav-links">
+    <a href="#features">Features</a>
+    <a href="#privacy">Privacy</a>
+    <a href="handoff.html">Docs</a>
+  </div>
+  <a class="btn btn-primary" href="#download">Get the app</a>
+</nav>
+
+<section class="hero">
+  <div class="hero-eyebrow">live · android privacy watchdog</div>
+  <h1>Catch apps in the <em>act</em>.</h1>
+  <p class="hero-sub">See exactly which apps tap your microphone, camera and location — the moment they do it. On your device. Always.</p>
+  <div class="hero-cta">
+    <a class="btn btn-primary" href="#download">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M3 20.5V3.5c0-.83.67-1.5 1.5-1.5l13.5 9.5L4.5 22c-.83 0-1.5-.67-1.5-1.5z" opacity=".4"/><path d="M14 12l4-2.5L4.5 2 14 12zm0 0L4.5 22 18 14.5 14 12z"/></svg>
+      Download for Android
+    </a>
+    <a class="btn btn-ghost" href="#features">See how it works</a>
+  </div>
+
+  <div class="hero-mock">
+    <div class="ph-bubble">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+        <rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5 11a7 7 0 0 0 14 0M12 18v3"/>
+      </svg>
+    </div>
+    <div class="phone">
+      <div class="ph-eyebrow">● live · 6 sensors · 247 apps</div>
+      <div class="ph-title">PhoneSec</div>
+      <div class="ph-card" style="display:flex; gap:14px; align-items:center;">
+        <div class="ph-ring"><div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font:700 18px/1 'JetBrains Mono';color:#3df0a8">64</div></div>
+        <div>
+          <div style="font:700 9px 'JetBrains Mono';color:#3df0ff;letter-spacing:.14em;text-transform:uppercase">privacy index</div>
+          <div style="font-size:13px;font-weight:600;margin-top:6px;line-height:1.3">3 apps acting<br/>suspicious right now</div>
+        </div>
+      </div>
+      <div class="ph-grid" style="margin-top: 14px">
+        <div class="ph-tile live"><div class="ph-lbl">Mic</div><div class="ph-num">2</div></div>
+        <div class="ph-tile"><div class="ph-lbl">Cam</div><div class="ph-num">0</div></div>
+        <div class="ph-tile warn"><div class="ph-lbl">GPS</div><div class="ph-num">3</div></div>
+        <div class="ph-tile warn"><div class="ph-lbl">Keys</div><div class="ph-num">1</div></div>
+        <div class="ph-tile"><div class="ph-lbl">Wi-Fi</div><div class="ph-num">4</div></div>
+        <div class="ph-tile"><div class="ph-lbl">BT</div><div class="ph-num">0</div></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="features" id="features">
+  <div class="section-eyebrow">● features</div>
+  <h2 class="section-h2">Six sensors. Every app. All the time.</h2>
+  <p class="section-sub">PhoneSec watches your phone's input devices and surfaces the moment any app touches them — even from the background.</p>
+
+  <div class="feat-grid">
+    <div class="feat">
+      <div class="feat-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5 11a7 7 0 0 0 14 0M12 18v3"/></svg></div>
+      <h3>Real-time monitoring</h3>
+      <p>Mic, camera, location, keyboard, Wi-Fi and Bluetooth — tracked continuously across every installed app.</p>
+    </div>
+    <div class="feat">
+      <div class="feat-icon" style="background: rgba(255,71,87,.14); color: var(--danger);"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l10 17H2z"/><path d="M12 10v5M12 18h.01"/></svg></div>
+      <h3>Caught-in-the-act bubble</h3>
+      <p>A floating chat-head appears the instant an app silently uses a sensor in the background. Tap to inspect.</p>
+    </div>
+    <div class="feat">
+      <div class="feat-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg></div>
+      <h3>24-hour heatmap</h3>
+      <p>Tap any app to see a per-sensor heatmap and a full timeline of foreground vs background access.</p>
+    </div>
+    <div class="feat">
+      <div class="feat-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l8 3v6c0 5-3.5 8.5-8 9-4.5-.5-8-4-8-9V6z"/><path d="M9 12l2 2 4-4"/></svg></div>
+      <h3>Traffic-light risk</h3>
+      <p>Every app gets a clear safe / warn / danger rating computed from its background access patterns.</p>
+    </div>
+    <div class="feat">
+      <div class="feat-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12h4l2-6 4 12 2-6h8"/></svg></div>
+      <h3>7-day threat history</h3>
+      <p>Grouped incident log shows everything caught in the last week — perfect for pattern-spotting.</p>
+    </div>
+    <div class="feat">
+      <div class="feat-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M4 8V5a1 1 0 0 1 1-1h3M16 4h3a1 1 0 0 1 1 1v3M20 16v3a1 1 0 0 1-1 1h-3M8 20H5a1 1 0 0 1-1-1v-3"/></svg></div>
+      <h3>Configurable alerts</h3>
+      <p>Bubble, banner, fullscreen takeover, or status-bar dot. Pick the sensitivity and per-sensor channels you want.</p>
+    </div>
+  </div>
+</section>
+
+<section class="promise" id="privacy">
+  <div class="promise-wrap">
+    <div class="section-eyebrow" style="color: var(--ok)">● our privacy promise</div>
+    <h2 class="section-h2" style="margin-left:auto; margin-right:auto;">Your data never leaves the device.</h2>
+    <p class="section-sub" style="margin: 0 auto;">PhoneSec watches everyone else's apps so you can watch them. We don't watch you.</p>
+    <div class="promise-list">
+      <div class="promise-item"><b>● No accounts</b><span>Open the app, you're in.</span></div>
+      <div class="promise-item"><b>● No servers</b><span>Zero network calls. Ever.</span></div>
+      <div class="promise-item"><b>● No analytics</b><span>No tracking SDKs. None.</span></div>
+      <div class="promise-item"><b>● No ads</b><span>Never have. Never will.</span></div>
+    </div>
+  </div>
+</section>
+
+<section class="cta" id="download">
+  <h2 class="cta-h">Take your phone back.</h2>
+  <p class="cta-sub">Free. No sign-up. Works in the background.</p>
+  <a class="btn btn-primary" href="#" style="padding: 16px 28px; font-size: 16px;">
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M3 20.5V3.5c0-.83.67-1.5 1.5-1.5l13.5 9.5L4.5 22c-.83 0-1.5-.67-1.5-1.5z" opacity=".4"/><path d="M14 12l4-2.5L4.5 2 14 12zm0 0L4.5 22 18 14.5 14 12z"/></svg>
+    Get it on Google Play
+  </a>
+</section>
+
+<footer>
+  <div>© 2026 PhoneSec · v1.0</div>
+  <div>
+    <a href="privacy-policy.html">Privacy</a>
+    <a href="handoff.html">Docs</a>
+    <a href="#">Contact</a>
+  </div>
+</footer>
+</body>
+</html>

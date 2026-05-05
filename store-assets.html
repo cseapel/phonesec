@@ -1,0 +1,392 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<title>PhoneSec — Play Store Assets</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet" />
+<style>
+  body { margin: 0; background: #0a0a0c; color: #e8f0ff;
+    font-family: 'Inter', system-ui, sans-serif; padding: 40px 24px 80px; }
+  .wrap { max-width: 1200px; margin: 0 auto; }
+  h1 { font-size: 32px; font-weight: 700; letter-spacing: -.02em; margin: 0 0 8px; }
+  h2 { font-size: 14px; font-weight: 700; letter-spacing: .12em; text-transform: uppercase;
+    color: rgba(232,240,255,.5); margin: 48px 0 16px;
+    font-family: 'JetBrains Mono', monospace; }
+  .lead { color: rgba(232,240,255,.6); margin: 0 0 12px; }
+  .row { display: flex; gap: 24px; flex-wrap: wrap; align-items: flex-start; }
+
+  /* Adaptive icon (512x512) */
+  .icon-512 {
+    width: 256px; height: 256px; border-radius: 56px;
+    background: radial-gradient(ellipse at 30% 25%, #3df0ff 0%, #1d3a8a 50%, #050b16 100%);
+    position: relative; overflow: hidden;
+    box-shadow: 0 30px 80px rgba(61,138,255,.25);
+  }
+  .icon-512::before {
+    content: ''; position: absolute; inset: 0;
+    background-image:
+      linear-gradient(rgba(61,240,255,.18) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(61,240,255,.18) 1px, transparent 1px);
+    background-size: 22px 22px;
+    mask-image: radial-gradient(circle at center, #000 25%, transparent 65%);
+  }
+  .icon-512 .shield {
+    position: absolute; inset: 0; display: flex; align-items: center; justify-content: center;
+    color: #fff; filter: drop-shadow(0 6px 18px rgba(0,0,0,.4));
+  }
+  .icon-512 .pulse {
+    position: absolute; left: 50%; top: 50%; transform: translate(-50%,-50%);
+    width: 84px; height: 84px; border-radius: 50%;
+    border: 2px solid rgba(255,71,87,.6);
+    animation: pulse-ring 1.8s ease-out infinite;
+  }
+  .icon-512 .pulse-2 { animation-delay: .9s; }
+  @keyframes pulse-ring {
+    0% { transform: translate(-50%,-50%) scale(.7); opacity: .9; }
+    100% { transform: translate(-50%,-50%) scale(2); opacity: 0; }
+  }
+
+  /* Feature graphic 1024x500 */
+  .feature {
+    width: 100%; max-width: 1024px; aspect-ratio: 1024/500;
+    border-radius: 14px; overflow: hidden; position: relative;
+    background:
+      radial-gradient(ellipse 60% 80% at 75% 50%, rgba(255,71,87,.18) 0%, transparent 60%),
+      radial-gradient(ellipse 60% 80% at 25% 50%, rgba(61,240,255,.18) 0%, transparent 60%),
+      linear-gradient(135deg, #0a1628 0%, #050b16 100%);
+  }
+  .feature::before {
+    content: ''; position: absolute; inset: 0;
+    background-image:
+      linear-gradient(rgba(61,240,255,.06) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(61,240,255,.06) 1px, transparent 1px);
+    background-size: 32px 32px;
+  }
+  .feature-content {
+    position: absolute; inset: 0; padding: 6.5%; display: flex; align-items: center;
+    justify-content: space-between; gap: 4%;
+  }
+  .feature-left { flex: 1; max-width: 560px; }
+  .feature-eyebrow { font-family: 'JetBrains Mono', monospace; font-size: 14px;
+    font-weight: 700; letter-spacing: .2em; text-transform: uppercase; color: #3df0ff; }
+  .feature-title { font-size: 56px; font-weight: 700; letter-spacing: -.025em;
+    line-height: 1.02; margin: 16px 0 14px; }
+  .feature-title em { font-style: normal; color: #ff4757; }
+  .feature-sub { font-size: 18px; color: rgba(232,240,255,.65); line-height: 1.45;
+    max-width: 460px; }
+  .feature-right {
+    width: 280px; flex-shrink: 0; position: relative; height: 360px;
+  }
+
+  /* Phone screenshot frame */
+  .phone {
+    width: 280px; height: 600px; border-radius: 36px;
+    background: #050b16; border: 8px solid rgba(255,255,255,.1);
+    overflow: hidden; box-shadow: 0 30px 80px rgba(0,0,0,.5);
+    display: flex; flex-direction: column;
+  }
+  .phone-tilt-1 { transform: rotate(-6deg) translateY(-30px) scale(.9); }
+  .phone-tilt-2 { transform: rotate(6deg) translateY(20px) scale(.9); }
+
+  /* Phone screenshot 1080x1920 representations */
+  .ss { width: 270px; height: 600px; border-radius: 28px; overflow: hidden;
+    background: linear-gradient(180deg, #0a1628 0%, #050b16 100%);
+    border: 1px solid rgba(255,255,255,.08); position: relative;
+    display: flex; flex-direction: column;
+    font-family: 'Inter', sans-serif; color: #e8f0ff;
+  }
+  .ss-header { padding: 16px 14px 10px; }
+  .ss-eyebrow { font: 700 9px/1.4 'JetBrains Mono', monospace;
+    letter-spacing: .16em; text-transform: uppercase; color: #3df0ff; }
+  .ss-title { font-size: 22px; font-weight: 700; letter-spacing: -.02em; margin-top: 6px; line-height: 1.1; }
+  .ss-title em { font-style: normal; color: #ff4757; }
+  .ss-img { flex: 1; padding: 0 14px 14px; display: flex; flex-direction: column; gap: 8px; }
+
+  /* Mini dashboard */
+  .mini-card { background: rgba(255,255,255,.03); border: 1px solid rgba(255,255,255,.06);
+    border-radius: 12px; padding: 12px; }
+  .mini-ring {
+    width: 60px; height: 60px; border-radius: 50%;
+    background: conic-gradient(#3df0a8 0deg 230deg, rgba(255,255,255,.08) 230deg);
+    -webkit-mask: radial-gradient(circle, transparent 50%, #000 52%);
+            mask: radial-gradient(circle, transparent 50%, #000 52%);
+    position: relative;
+  }
+  .mini-row { display: flex; align-items: center; gap: 10px; }
+  .mini-glyph { width: 28px; height: 28px; border-radius: 7px; flex-shrink: 0;
+    display: flex; align-items: center; justify-content: center;
+    font: 700 11px/1 'JetBrains Mono', monospace; color: #0a1628; }
+  .mini-name { font-size: 11px; font-weight: 600; }
+  .mini-sub { font-size: 9px; color: rgba(232,240,255,.5);
+    font-family: 'JetBrains Mono', monospace; margin-top: 2px; }
+  .mini-pill { font: 700 8px/1 'JetBrains Mono', monospace; letter-spacing: .12em;
+    text-transform: uppercase; padding: 3px 6px; border-radius: 100px; }
+  .pill-danger { background: rgba(255,71,87,.14); color: #ff4757; }
+  .pill-warn { background: rgba(255,181,71,.14); color: #ffb547; }
+  .pill-safe { background: rgba(61,240,168,.14); color: #3df0a8; }
+
+  .grid-sensors { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 6px; }
+  .sensor-tile { padding: 8px; border-radius: 9px; background: rgba(255,255,255,.025);
+    border: 1px solid rgba(255,255,255,.06); }
+  .sensor-tile.live { background: rgba(255,71,87,.12); border-color: rgba(255,71,87,.35); color: #ff4757; }
+  .sensor-tile.live-amber { background: rgba(255,181,71,.12); border-color: rgba(255,181,71,.35); color: #ffb547; }
+  .sensor-lbl { font-size: 9px; color: rgba(232,240,255,.5); }
+  .sensor-num { font: 700 14px/1 'JetBrains Mono', monospace; margin-top: 4px; }
+
+  .ss-bubble {
+    position: absolute; right: 14px; top: 90px;
+    width: 44px; height: 44px; border-radius: 50%;
+    background: linear-gradient(135deg, #ff4757, #c92741);
+    display: flex; align-items: center; justify-content: center;
+    color: #fff; box-shadow: 0 0 0 8px rgba(255,71,87,.2), 0 8px 20px rgba(0,0,0,.4);
+  }
+  .ss-bubble-card {
+    position: absolute; right: 64px; top: 92px;
+    background: rgba(10,22,40,.95); border: 1px solid rgba(255,71,87,.4);
+    border-radius: 10px; padding: 8px 10px; min-width: 130px;
+  }
+  .ss-bubble-eyebrow { font: 700 7px/1 'JetBrains Mono', monospace;
+    letter-spacing: .14em; text-transform: uppercase; color: #ff6b7a; }
+  .ss-bubble-text { font-size: 10px; font-weight: 600; margin-top: 3px; }
+
+  .heatmap { display: flex; gap: 1px; margin-top: 8px; }
+  .hm { flex: 1; height: 14px; border-radius: 1px; background: rgba(255,255,255,.05); }
+  .hm.on { background: #ff4757; opacity: .7; }
+  .hm.warn-on { background: #ffb547; opacity: .7; }
+
+  .label { font-family: 'JetBrains Mono', monospace; font-size: 11px;
+    color: rgba(232,240,255,.5); margin-top: 8px; }
+  .specs { font-family: 'JetBrains Mono', monospace; font-size: 11px;
+    color: rgba(232,240,255,.45); }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>PhoneSec — Play Store Assets</h1>
+  <p class="lead">Drop-in graphics for the Google Play listing. Each block lists Play's required size; this page shows scaled visuals — see the export notes at the bottom for high-res output.</p>
+
+  <h2>1 — App Icon  <span class="specs">· 512 × 512 PNG (Play) + adaptive 108×108dp foreground</span></h2>
+  <div class="row">
+    <div class="icon-512">
+      <div class="pulse"></div>
+      <div class="pulse pulse-2"></div>
+      <div class="shield">
+        <svg width="120" height="120" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"
+             stroke-linecap="round" stroke-linejoin="round">
+          <path d="M12 3l8 3v6c0 5-3.5 8.5-8 9-4.5-.5-8-4-8-9V6z" fill="rgba(255,255,255,.1)" />
+          <path d="M9 12l2 2 4-4" />
+        </svg>
+      </div>
+    </div>
+    <div style="max-width:380px">
+      <div class="label">Icon concept</div>
+      <p style="color:rgba(232,240,255,.65); font-size:14px; line-height:1.55">
+        Cyan-on-deep-navy shield with a checkmark — communicates protection and verified-clean.
+        The pulsing ring hints at active scanning. Adaptive icon: shield centered on the cyan radial,
+        gridded background in the lower layer.
+      </p>
+    </div>
+  </div>
+
+  <h2>2 — Feature Graphic <span class="specs">· 1024 × 500 PNG · top of Play listing</span></h2>
+  <div class="feature">
+    <div class="feature-content">
+      <div class="feature-left">
+        <div class="feature-eyebrow">● PhoneSec</div>
+        <div class="feature-title">Catch apps in the <em>act</em>.</div>
+        <div class="feature-sub">See exactly which apps tap your mic, camera and location — the moment they do it.</div>
+      </div>
+      <div class="feature-right">
+        <div style="position:absolute; inset:0;">
+          <div class="phone phone-tilt-1" style="position:absolute; left:-30px; top:0;">
+            <div class="ss">
+              <div class="ss-header">
+                <div class="ss-eyebrow">● live · caught</div>
+                <div class="ss-title">Mozaic Social</div>
+                <div class="mini-sub" style="margin-top:4px">using microphone</div>
+              </div>
+              <div class="ss-img">
+                <div class="grid-sensors">
+                  <div class="sensor-tile live"><div class="sensor-lbl">Mic</div><div class="sensor-num">2</div></div>
+                  <div class="sensor-tile"><div class="sensor-lbl">Cam</div><div class="sensor-num">0</div></div>
+                  <div class="sensor-tile live-amber"><div class="sensor-lbl">GPS</div><div class="sensor-num">3</div></div>
+                </div>
+              </div>
+              <div class="ss-bubble">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+                  <rect x="9" y="3" width="6" height="11" rx="3" />
+                  <path d="M5 11a7 7 0 0 0 14 0M12 18v3" />
+                </svg>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <p class="label">Feature graphic 1024×500</p>
+
+  <h2>3 — Phone Screenshots <span class="specs">· 1080 × 1920 PNG · need at least 2, up to 8</span></h2>
+  <div class="row" style="gap:18px">
+
+    <!-- 1: Dashboard -->
+    <div class="ss">
+      <div class="ss-header">
+        <div class="ss-eyebrow">screenshot 1 of 4</div>
+        <div class="ss-title">Your privacy<br/>at a glance</div>
+      </div>
+      <div class="ss-img">
+        <div class="mini-card" style="display:flex; align-items:center; gap:12px">
+          <div class="mini-ring"><div style="position:absolute; inset:0; display:flex; align-items:center; justify-content:center; font:700 16px/1 'JetBrains Mono'; color:#3df0a8">64</div></div>
+          <div>
+            <div style="font:700 9px 'JetBrains Mono'; color:#3df0ff; letter-spacing:.12em">PRIVACY INDEX</div>
+            <div style="font-size:11px; margin-top:4px; line-height:1.3">3 apps acting<br/>suspicious right now</div>
+          </div>
+        </div>
+        <div class="grid-sensors">
+          <div class="sensor-tile live"><div class="sensor-lbl">Mic</div><div class="sensor-num">2</div></div>
+          <div class="sensor-tile"><div class="sensor-lbl">Cam</div><div class="sensor-num">0</div></div>
+          <div class="sensor-tile live-amber"><div class="sensor-lbl">GPS</div><div class="sensor-num">3</div></div>
+          <div class="sensor-tile live-amber"><div class="sensor-lbl">Keys</div><div class="sensor-num">1</div></div>
+          <div class="sensor-tile"><div class="sensor-lbl">Wi-Fi</div><div class="sensor-num">4</div></div>
+          <div class="sensor-tile"><div class="sensor-lbl">BT</div><div class="sensor-num">0</div></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 2: Caught -->
+    <div class="ss">
+      <div class="ss-header">
+        <div class="ss-eyebrow">screenshot 2 of 4</div>
+        <div class="ss-title">Caught<br/>in the <em>act</em></div>
+      </div>
+      <div class="ss-img" style="position:relative">
+        <div class="mini-card">
+          <div class="mini-row">
+            <div class="mini-glyph" style="background:#ff6b9d">MS</div>
+            <div style="flex:1">
+              <div class="mini-name">Mozaic Social</div>
+              <div class="mini-sub">used mic · 30s ago</div>
+            </div>
+            <div class="mini-pill pill-danger">Danger</div>
+          </div>
+        </div>
+        <div class="ss-bubble">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="9" y="3" width="6" height="11" rx="3" />
+            <path d="M5 11a7 7 0 0 0 14 0M12 18v3" />
+          </svg>
+        </div>
+        <div class="ss-bubble-card">
+          <div class="ss-bubble-eyebrow">● live</div>
+          <div class="ss-bubble-text">Mozaic using mic</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 3: Per-app heatmap -->
+    <div class="ss">
+      <div class="ss-header">
+        <div class="ss-eyebrow">screenshot 3 of 4</div>
+        <div class="ss-title">See every<br/>access</div>
+      </div>
+      <div class="ss-img">
+        <div class="mini-card">
+          <div class="mini-row">
+            <div class="mini-glyph" style="background:#7c8cff">TW</div>
+            <div style="flex:1">
+              <div class="mini-name">TypeWise Keyboard</div>
+              <div class="mini-sub">1,204 accesses · 24h</div>
+            </div>
+            <div class="mini-pill pill-danger">Danger</div>
+          </div>
+          <div class="heatmap">
+            <div class="hm"></div><div class="hm warn-on"></div><div class="hm"></div>
+            <div class="hm warn-on"></div><div class="hm warn-on"></div><div class="hm"></div>
+            <div class="hm warn-on"></div><div class="hm on"></div><div class="hm"></div>
+            <div class="hm warn-on"></div><div class="hm warn-on"></div><div class="hm warn-on"></div>
+            <div class="hm on"></div><div class="hm warn-on"></div><div class="hm on"></div>
+            <div class="hm on"></div><div class="hm warn-on"></div><div class="hm on"></div>
+            <div class="hm on"></div><div class="hm on"></div><div class="hm warn-on"></div>
+            <div class="hm on"></div><div class="hm warn-on"></div><div class="hm on"></div>
+          </div>
+          <div style="display:flex; justify-content:space-between; margin-top:4px;
+                      font:9px 'JetBrains Mono'; color:rgba(232,240,255,.4)">
+            <span>00:00</span><span>12:00</span><span>now</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 4: Threat history -->
+    <div class="ss">
+      <div class="ss-header">
+        <div class="ss-eyebrow">screenshot 4 of 4</div>
+        <div class="ss-title">Built for<br/>privacy. Always.</div>
+      </div>
+      <div class="ss-img">
+        <div class="mini-card" style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:6px">
+          <div><div class="mini-sub" style="font-size:7px">7d</div><div class="sensor-num" style="color:#ff4757">23</div></div>
+          <div><div class="mini-sub" style="font-size:7px">Blocked</div><div class="sensor-num" style="color:#3df0ff">4</div></div>
+          <div><div class="mini-sub" style="font-size:7px">Allowed</div><div class="sensor-num" style="color:#3df0a8">19</div></div>
+        </div>
+        <div class="mini-card">
+          <div class="mini-row">
+            <div class="mini-glyph" style="background:#ff6b9d">MS</div>
+            <div style="flex:1">
+              <div class="mini-name">Mozaic Social</div>
+              <div class="mini-sub">mic 14× background</div>
+            </div>
+          </div>
+        </div>
+        <div class="mini-card">
+          <div class="mini-row">
+            <div class="mini-glyph" style="background:#ffce5c">FL</div>
+            <div style="flex:1">
+              <div class="mini-name">FlashLite Torch</div>
+              <div class="mini-sub">GPS while screen off</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <h2>Listing Copy</h2>
+  <div class="mini-card" style="max-width:760px; padding: 20px;">
+    <div style="font-weight:700; font-size:18px; margin-bottom: 8px">PhoneSec — Privacy Watchdog</div>
+    <div class="mini-sub" style="margin-bottom: 14px">Short description (80 char max)</div>
+    <p style="font-size:13px; color:rgba(232,240,255,.8); border-left: 2px solid #3df0ff; padding-left:12px; margin: 0 0 18px">
+      See which apps use your mic, camera and location — the moment they do.
+    </p>
+    <div class="mini-sub" style="margin-bottom: 8px">Long description (4000 char max)</div>
+    <p style="font-size:13px; color:rgba(232,240,255,.8); line-height:1.6">
+      PhoneSec watches your phone's input devices and tells you, in real time, which apps are using them. Microphone, camera, GPS, keyboard, Wi-Fi and Bluetooth — all monitored, all visible.
+    </p>
+    <p style="font-size:13px; color:rgba(232,240,255,.8); line-height:1.6">
+      <b>Hero feature</b> — a floating bubble appears the moment any app silently accesses a sensor in the background. Tap it to inspect the app, see its full access history, and block it.
+    </p>
+    <p style="font-size:13px; color:rgba(232,240,255,.8); line-height:1.6">
+      <b>Privacy-first by design</b> — everything happens on your device. No accounts, no telemetry, no cloud. Your activity log auto-prunes after 30 days.
+    </p>
+    <p style="font-size:13px; color:rgba(232,240,255,.8); line-height:1.6">
+      <b>What you get:</b><br/>
+      • Live dashboard with privacy-index score<br/>
+      • Real-time activity feed across all apps<br/>
+      • Per-app 24-hour heatmap and timeline<br/>
+      • Traffic-light risk rating<br/>
+      • 7-day threat history with grouped incidents<br/>
+      • Configurable alert delivery — bubble, banner, fullscreen or status bar
+    </p>
+  </div>
+
+  <h2>Export Notes</h2>
+  <p style="color:rgba(232,240,255,.65); font-size:13px; line-height:1.55; max-width:760px">
+    To export at Play's required resolutions, take screenshots of this page (or the prototype) at the listed sizes:
+    icon 512×512, feature graphic 1024×500, phone screenshots 1080×1920 each. Browser DevTools device emulation
+    or a Puppeteer script will produce pixel-exact PNGs. The visuals here are scaled for layout — boost the
+    base font + element sizes proportionally when capturing for upload.
+  </p>
+</div>
+</body>
+</html>

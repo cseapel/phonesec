@@ -1,0 +1,545 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>PhoneSec — Privacy Watchdog</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet" />
+<style>
+  html, body {
+    margin: 0; padding: 0; height: 100%; background: #050b16; color: #e8f0ff;
+    font-family: 'Inter', system-ui, -apple-system, sans-serif;
+    -webkit-font-smoothing: antialiased; overflow: hidden;
+  }
+  #stage {
+    position: fixed; inset: 0;
+    display: flex; align-items: center; justify-content: center;
+    background:
+      radial-gradient(ellipse 80% 60% at 50% 0%, rgba(61,138,255,.10) 0%, rgba(5,11,22,0) 60%),
+      radial-gradient(ellipse 60% 50% at 50% 100%, rgba(61,240,255,.06) 0%, rgba(5,11,22,0) 60%),
+      #050b16;
+  }
+  #stage::before {
+    content: ''; position: absolute; inset: 0; pointer-events: none;
+    background-image:
+      linear-gradient(rgba(61,240,255,.04) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(61,240,255,.04) 1px, transparent 1px);
+    background-size: 32px 32px;
+    mask-image: radial-gradient(ellipse 80% 80% at 50% 50%, #000 30%, transparent 75%);
+  }
+  #root { position: relative; }
+  @keyframes mfs-blink { 0%,100%{opacity:1} 50%{opacity:.35} }
+  @keyframes mfs-fadein { from{opacity:0; transform:translateY(8px)} to{opacity:1; transform:none} }
+  .mfs-screen { animation: mfs-fadein .25s ease-out; }
+</style>
+</head>
+<body>
+<div id="stage"><div id="root"></div></div>
+
+<script src="https://unpkg.com/react@18.3.1/umd/react.development.js" integrity="sha384-hD6/rw4ppMLGNu3tX5cjIb+uRZ7UkRJ6BPkLpg4hAu/6onKUg4lLsHAs9EBPT82L" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" integrity="sha384-u6aeetuaXnQ38mYT8rp6sbXaQe3NL9t+IBXmnYxwkUI2Hw4bsp2Wvmx4yRQF1uAm" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" integrity="sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y" crossorigin="anonymous"></script>
+
+<script type="text/babel" src="android-frame.jsx"></script>
+<script type="text/babel" src="tweaks-panel.jsx"></script>
+<script type="text/babel" src="icons.jsx"></script>
+<script type="text/babel" src="bubble.jsx"></script>
+<script type="text/babel" src="screens.jsx"></script>
+<script type="text/babel" src="extra-screens.jsx"></script>
+
+<script type="text/babel">
+// ── mock data ───────────────────────────────────────────────────────────────
+const MOCK_APPS = [
+  { id: 'mz', name: 'Mozaic Social', bundle: 'com.mozaic.social', color: '#ff6b9d',
+    permissions: ['mic','cam','gps','wifi'], risk: 'danger',
+    accesses24h: 142, bgPct: 78, installed: '3 mo',
+    lastAccessTs: Date.now() - 30*1000 },
+  { id: 'fl', name: 'FlashLite Torch', bundle: 'io.flashlite.torch', color: '#ffce5c',
+    permissions: ['gps','cam','wifi','bt'], risk: 'danger',
+    accesses24h: 67, bgPct: 92, installed: '2 wk',
+    lastAccessTs: Date.now() - 2*60*1000 },
+  { id: 'kb', name: 'TypeWise Keyboard', bundle: 'co.typewise.kb', color: '#7c8cff',
+    permissions: ['key','wifi'], risk: 'danger',
+    accesses24h: 1204, bgPct: 100, installed: '1 yr',
+    lastAccessTs: Date.now() - 10*1000 },
+  { id: 'st', name: 'Stride Run', bundle: 'fit.stride.run', color: '#3df0a8',
+    permissions: ['gps','bt'], risk: 'warn',
+    accesses24h: 28, bgPct: 31, installed: '6 mo',
+    lastAccessTs: Date.now() - 18*60*1000 },
+  { id: 'wt', name: 'Weatherly', bundle: 'app.weatherly', color: '#3df0ff',
+    permissions: ['gps','wifi'], risk: 'warn',
+    accesses24h: 14, bgPct: 22, installed: '2 yr',
+    lastAccessTs: Date.now() - 42*60*1000 },
+  { id: 'ph', name: 'Camera Pro', bundle: 'pro.camera', color: '#a085ff',
+    permissions: ['cam','mic','gps'], risk: 'safe',
+    accesses24h: 4, bgPct: 0, installed: '8 mo',
+    lastAccessTs: Date.now() - 4*60*60*1000 },
+  { id: 'sl', name: 'SleepWell', bundle: 'health.sleepwell', color: '#5ce0d8',
+    permissions: ['mic'], risk: 'safe',
+    accesses24h: 8, bgPct: 100, installed: '4 mo',
+    lastAccessTs: Date.now() - 9*60*60*1000 },
+  { id: 'mp', name: 'MapNav', bundle: 'navi.mapnav', color: '#ff9966',
+    permissions: ['gps','wifi','bt'], risk: 'safe',
+    accesses24h: 12, bgPct: 5, installed: '1 yr',
+    lastAccessTs: Date.now() - 2*60*60*1000 },
+];
+
+const MOCK_EVENTS = [
+  { appId: 'kb', sensor: 'key',  live: true,  bg: true,  when: 'now',     hour: 23, duration: '14m' },
+  { appId: 'mz', sensor: 'mic',  live: true,  bg: true,  when: '00:30s',  hour: 23, duration: '32s' },
+  { appId: 'fl', sensor: 'gps',  live: false, bg: true,  when: '2m ago',  hour: 23, duration: '8s'  },
+  { appId: 'mz', sensor: 'cam',  live: false, bg: true,  when: '4m ago',  hour: 23, duration: '3s'  },
+  { appId: 'st', sensor: 'gps',  live: false, bg: false, when: '18m ago', hour: 22, duration: '12m' },
+  { appId: 'mz', sensor: 'wifi', live: false, bg: true,  when: '24m ago', hour: 22 },
+  { appId: 'kb', sensor: 'key',  live: false, bg: true,  when: '1h ago',  hour: 21 },
+  { appId: 'wt', sensor: 'gps',  live: false, bg: true,  when: '42m ago', hour: 22 },
+  { appId: 'fl', sensor: 'cam',  live: false, bg: true,  when: '3h ago',  hour: 20, duration: '2s' },
+  { appId: 'mp', sensor: 'gps',  live: false, bg: false, when: '2h ago',  hour: 21, duration: '24m' },
+  { appId: 'kb', sensor: 'wifi', live: false, bg: true,  when: '5h ago',  hour: 18 },
+  { appId: 'sl', sensor: 'mic',  live: false, bg: true,  when: '9h ago',  hour: 14, duration: '7h' },
+];
+
+window.MOCK_APPS = MOCK_APPS;
+window.MOCK_EVENTS = MOCK_EVENTS;
+
+// ── theme handling ──────────────────────────────────────────────────────────
+const THEMES = {
+  midnight:  { bg0: '#050b16', bg1: '#0a1628', accent: '#3df0ff' },
+  ink:       { bg0: '#070710', bg1: '#0d0e1f', accent: '#a78bfa' },
+  signal:    { bg0: '#021014', bg1: '#062029', accent: '#3df0a8' },
+  carbon:    { bg0: '#0a0a0c', bg1: '#15151a', accent: '#ff8c42' },
+};
+
+const FONTS = {
+  inter:   { ui: "'Inter', system-ui, sans-serif", mono: "'JetBrains Mono', ui-monospace, monospace" },
+  grotesk: { ui: "'Space Grotesk', system-ui, sans-serif", mono: "'JetBrains Mono', ui-monospace, monospace" },
+};
+
+// ── App ─────────────────────────────────────────────────────────────────────
+const TWEAK_DEFAULTS = /*EDITMODE-BEGIN*/{
+  "theme": "midnight",
+  "intensity": "balanced",
+  "alertStyle": "bubble",
+  "density": "regular",
+  "font": "inter",
+  "showAlert": true,
+  "onboarded": true
+}/*EDITMODE-END*/;
+
+function PhoneSecApp() {
+  const [t, setTweak] = useTweaks(TWEAK_DEFAULTS);
+  const [tab, setTab] = React.useState('home');
+  const [picked, setPicked] = React.useState(null);
+  const [sensorFilter, setSensorFilter] = React.useState(null);
+  const [onboardStep, setOnboardStep] = React.useState(t.onboarded ? -1 : 0);
+  const [subScreen, setSubScreen] = React.useState(null); // 'history' | 'notifs'
+  const theme = THEMES[t.theme] || THEMES.midnight;
+  const font = FONTS[t.font] || FONTS.inter;
+
+  // active alert (bubble feeds from a live event)
+  const liveAlert = React.useMemo(() => {
+    const ev = MOCK_EVENTS.find(e => e.live && e.bg);
+    if (!ev) return null;
+    const app = MOCK_APPS.find(a => a.id === ev.appId);
+    return { app: app.name, sensor: ev.sensor, appId: ev.appId };
+  }, []);
+
+  // when a sensor is picked from dashboard, jump to apps tab w/ filter
+  const handleOpenSensor = (s) => { setSensorFilter(s); setTab('apps'); };
+
+  // ── screen rendering ──
+  let screen, title, sub, onBack;
+  if (picked) {
+    screen = <AppDetail app={picked} events={MOCK_EVENTS} density={t.density} />;
+    title = picked.name; sub = picked.bundle;
+    onBack = () => setPicked(null);
+  } else if (tab === 'home') {
+    screen = <Dashboard apps={MOCK_APPS} events={MOCK_EVENTS}
+                density={t.density} intensity={t.intensity}
+                onPickApp={setPicked}
+                onOpenList={() => setTab('apps')}
+                onOpenSensor={handleOpenSensor} />;
+    title = 'PhoneSec';
+    sub = 'watching · 6 sensors · 247 apps';
+  } else if (tab === 'apps') {
+    screen = <AppList apps={MOCK_APPS} onPickApp={setPicked}
+                sensorFilter={sensorFilter} density={t.density}
+                onClearFilter={() => setSensorFilter(null)} />;
+    title = 'Apps'; sub = '247 monitored';
+  } else if (subScreen === 'history') {
+    screen = <ThreatHistory apps={MOCK_APPS} onPickApp={setPicked} density={t.density} />;
+    title = 'Threat history'; sub = 'last 7 days';
+    onBack = () => setSubScreen(null);
+  } else if (subScreen === 'notifs') {
+    screen = <SettingsDetail density={t.density} />;
+    title = 'Notifications'; sub = 'alert delivery';
+    onBack = () => setSubScreen(null);
+  } else if (tab === 'feed') {
+    screen = (
+      <div style={{ padding: 16, display: 'flex', flexDirection: 'column', gap: 8 }}>
+        <SectionHeadStub title="All activity" sub="last 24 hours" />
+        <div style={{
+          marginTop: 6, borderRadius: 14,
+          background: 'rgba(255,255,255,.025)',
+          border: '1px solid rgba(255,255,255,.06)',
+          overflow: 'hidden',
+        }}>
+          {MOCK_EVENTS.map((ev, i) => {
+            const app = MOCK_APPS.find(a => a.id === ev.appId);
+            const meta = SENSORS[ev.sensor];
+            const G = Icon[meta.icon];
+            const tone = TONES[meta.tone];
+            return (
+              <div key={i} onClick={() => setPicked(app)} style={{
+                display: 'flex', alignItems: 'center', gap: 12, padding: '11px 12px',
+                borderBottom: i === MOCK_EVENTS.length - 1 ? 'none' : '1px solid rgba(255,255,255,.04)',
+                cursor: 'pointer',
+              }}>
+                <AppGlyph name={app.name} color={app.color} size={30} radius={8} />
+                <div style={{ flex: 1, minWidth: 0 }}>
+                  <div style={{ fontSize: 13, color: '#e8f0ff', fontWeight: 500 }}>{app.name}</div>
+                  <div style={{
+                    fontSize: 10, color: 'rgba(232,240,255,.5)', marginTop: 2,
+                    fontFamily: 'JetBrains Mono, monospace',
+                  }}>
+                    <span style={{ color: tone.fg }}>● </span>
+                    {ev.live ? 'using ' : 'used '}{meta.label.toLowerCase()} · {ev.when}
+                  </div>
+                </div>
+                <div style={{ color: tone.fg }}><G width="15" height="15" /></div>
+              </div>
+            );
+          })}
+        </div>
+      </div>
+    );
+    title = 'Activity feed'; sub = 'real-time';
+  } else {
+    screen = <YouScreen onOpen={setSubScreen} />;
+    title = 'You'; sub = 'profile · settings';
+  }
+
+  // onboarding overlay
+  if (onboardStep >= 0) {
+    return (
+      <div style={{ fontFamily: font.ui }}>
+        <style>{`body { font-family: ${font.ui}; }
+          #stage { background:
+            radial-gradient(ellipse 80% 60% at 50% 0%, ${theme.accent}1A 0%, ${theme.bg0} 60%),
+            ${theme.bg0};
+          }`}</style>
+        <AndroidDevice dark width={412} height={892}>
+          <div style={{
+            minHeight: '100%',
+            background: `linear-gradient(180deg, ${theme.bg1} 0%, ${theme.bg0} 100%)`,
+            color: '#e8f0ff', display: 'flex', flexDirection: 'column',
+          }}>
+            <Onboarding step={onboardStep}
+              onNext={() => {
+                if (onboardStep >= 2) { setOnboardStep(-1); setTweak('onboarded', true); }
+                else setOnboardStep(onboardStep + 1);
+              }}
+              onSkip={() => { setOnboardStep(-1); setTweak('onboarded', true); }} />
+          </div>
+        </AndroidDevice>
+      </div>
+    );
+  }
+
+  return (
+    <div style={{ fontFamily: font.ui }}>
+      <style>{`
+        body { font-family: ${font.ui}; }
+        #stage { background:
+          radial-gradient(ellipse 80% 60% at 50% 0%, ${theme.accent}1A 0%, ${theme.bg0} 60%),
+          radial-gradient(ellipse 60% 50% at 50% 100%, ${theme.accent}0A 0%, ${theme.bg0} 60%),
+          ${theme.bg0};
+        }
+      `}</style>
+      <AndroidDevice dark width={412} height={892}>
+        <div style={{
+          position: 'relative',
+          minHeight: '100%',
+          background: `linear-gradient(180deg, ${theme.bg1} 0%, ${theme.bg0} 100%)`,
+          color: '#e8f0ff',
+          display: 'flex', flexDirection: 'column',
+        }}>
+          <TopBar title={title} sub={sub} onBack={onBack} />
+          <div className="mfs-screen" key={picked ? picked.id : tab} style={{ flex: 1, overflow: 'auto' }}>
+            {screen}
+          </div>
+          <TabBar tab={tab} onTab={(k) => { setPicked(null); setSensorFilter(null); setSubScreen(null); setTab(k); }} />
+          {/* hero: floating alert bubble */}
+          {t.showAlert && t.alertStyle === 'bubble' && liveAlert && !picked && (
+            <AlertBubble alert={liveAlert}
+              density={t.density}
+              onTap={() => {
+                const a = MOCK_APPS.find(x => x.id === liveAlert.appId);
+                setPicked(a);
+              }}
+              onDismiss={() => setTweak('showAlert', false)} />
+          )}
+          {t.showAlert && t.alertStyle === 'banner' && liveAlert && !picked && (
+            <BannerAlert alert={liveAlert} onTap={() => {
+              const a = MOCK_APPS.find(x => x.id === liveAlert.appId);
+              setPicked(a);
+            }} />
+          )}
+          {t.showAlert && t.alertStyle === 'fullscreen' && liveAlert && !picked && (
+            <FullscreenAlert alert={liveAlert}
+              onDismiss={() => setTweak('showAlert', false)}
+              onTap={() => {
+                const a = MOCK_APPS.find(x => x.id === liveAlert.appId);
+                setPicked(a); setTweak('showAlert', false);
+              }} />
+          )}
+          {t.showAlert && t.alertStyle === 'statusbar' && liveAlert && !picked && (
+            <StatusbarAlert alert={liveAlert} />
+          )}
+        </div>
+      </AndroidDevice>
+
+      <TweaksPanel title="Tweaks · PhoneSec">
+        <TweakSection label="Theme" />
+        <TweakSelect label="Color theme" value={t.theme}
+          options={[
+            {value:'midnight', label:'Midnight (cyan)'},
+            {value:'ink', label:'Ink (violet)'},
+            {value:'signal', label:'Signal (green)'},
+            {value:'carbon', label:'Carbon (amber)'},
+          ]}
+          onChange={(v) => setTweak('theme', v)} />
+        <TweakSelect label="Font pairing" value={t.font}
+          options={[
+            {value:'inter', label:'Inter + JetBrains'},
+            {value:'grotesk', label:'Space Grotesk + JetBrains'},
+          ]}
+          onChange={(v) => setTweak('font', v)} />
+        <TweakRadio label="Density" value={t.density}
+          options={['compact','regular','comfy']}
+          onChange={(v) => setTweak('density', v)} />
+
+        <TweakSection label="Threat tone" />
+        <TweakRadio label="Intensity" value={t.intensity}
+          options={['calm','balanced','alarming']}
+          onChange={(v) => setTweak('intensity', v)} />
+
+        <TweakSection label="Alert style" />
+        <TweakSelect label="Alert UI" value={t.alertStyle}
+          options={[
+            {value:'bubble', label:'Floating bubble (default)'},
+            {value:'banner', label:'Top banner'},
+            {value:'fullscreen', label:'Fullscreen takeover'},
+            {value:'statusbar', label:'Status bar dot'},
+          ]}
+          onChange={(v) => { setTweak('alertStyle', v); setTweak('showAlert', true); }} />
+        <TweakToggle label="Show live alert" value={t.showAlert}
+          onChange={(v) => setTweak('showAlert', v)} />
+      </TweaksPanel>
+    </div>
+  );
+}
+
+function SectionHeadStub({ title, sub }) {
+  return (
+    <div>
+      <div style={{ fontSize: 13, fontWeight: 600, color: '#e8f0ff' }}>{title}</div>
+      <div style={{
+        fontSize: 10, color: 'rgba(232,240,255,.4)', marginTop: 2,
+        fontFamily: 'JetBrains Mono, monospace', letterSpacing: '.06em',
+      }}>{sub}</div>
+    </div>
+  );
+}
+
+function YouScreen({ onOpen }) {
+  const rows = [
+    ['Threat history',  '23 incidents · 7 days', 'history'],
+    ['Notifications',   'bubble alerts, sounds', 'notifs'],
+    ['Auto-block rules','3 rules active',        null],
+    ['Trusted apps',    '12 apps allowlisted',   null],
+    ['Scan schedule',   'every 6 hours',         null],
+    ['Export report',   'PDF / CSV',             null],
+  ];
+  return (
+    <div style={{ padding: 16, display: 'flex', flexDirection: 'column', gap: 12 }}>
+      <div style={{
+        padding: 16, borderRadius: 14,
+        background: 'rgba(255,255,255,.025)',
+        border: '1px solid rgba(255,255,255,.06)',
+      }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+          <div style={{
+            width: 48, height: 48, borderRadius: 12,
+            background: 'linear-gradient(135deg, #3df0ff 0%, #3d8aff 100%)',
+            color: '#0a1628', display:'flex', alignItems:'center', justifyContent:'center',
+            fontFamily: 'JetBrains Mono, monospace', fontSize: 18, fontWeight: 700,
+          }}>SY</div>
+          <div>
+            <div style={{ fontSize: 15, fontWeight: 600 }}>Sentinel Pro</div>
+            <div style={{
+              fontSize: 11, color: 'rgba(232,240,255,.5)',
+              fontFamily: 'JetBrains Mono, monospace',
+            }}>renewed · 11 mo left</div>
+          </div>
+        </div>
+      </div>
+      {rows.map(([l, s, key]) => (
+        <div key={l} onClick={() => key && onOpen(key)} style={{
+          display: 'flex', alignItems: 'center', gap: 10,
+          padding: '13px 14px', borderRadius: 12,
+          background: 'rgba(255,255,255,.025)',
+          border: '1px solid rgba(255,255,255,.06)',
+          cursor: key ? 'pointer' : 'default',
+        }}>
+          <div style={{ flex: 1 }}>
+            <div style={{ fontSize: 13, fontWeight: 500 }}>{l}</div>
+            <div style={{
+              fontSize: 10, color: 'rgba(232,240,255,.5)', marginTop: 2,
+              fontFamily: 'JetBrains Mono, monospace',
+            }}>{s}</div>
+          </div>
+          <Icon.chevR width="16" height="16" style={{ color: 'rgba(232,240,255,.4)' }} />
+        </div>
+      ))}
+    </div>
+  );
+}
+
+// ── alternate alert UIs ─────────────────────────────────────────────────────
+function BannerAlert({ alert, onTap }) {
+  const meta = SENSORS[alert.sensor];
+  const G = Icon[meta.icon];
+  return (
+    <div onClick={onTap} style={{
+      position: 'absolute', top: 8, left: 8, right: 8, zIndex: 20,
+      display: 'flex', alignItems: 'center', gap: 10,
+      padding: '10px 12px', borderRadius: 12,
+      background: 'linear-gradient(135deg, rgba(255,71,87,.95) 0%, rgba(201,39,65,.95) 100%)',
+      color: '#fff', cursor: 'pointer',
+      boxShadow: '0 8px 24px rgba(255,71,87,.4)',
+      animation: 'mfs-fadein .3s ease-out',
+    }}>
+      <G width="20" height="20" />
+      <div style={{ flex: 1, minWidth: 0 }}>
+        <div style={{
+          fontSize: 9, fontWeight: 700, letterSpacing: '.14em',
+          textTransform: 'uppercase', opacity: .85,
+          fontFamily: 'JetBrains Mono, monospace',
+        }}>● caught in the act</div>
+        <div style={{ fontSize: 13, fontWeight: 600 }}>
+          {alert.app} is using {meta.label.toLowerCase()}
+        </div>
+      </div>
+      <Icon.chevR width="16" height="16" />
+    </div>
+  );
+}
+
+function FullscreenAlert({ alert, onTap, onDismiss }) {
+  const meta = SENSORS[alert.sensor];
+  const G = Icon[meta.icon];
+  return (
+    <div style={{
+      position: 'absolute', inset: 0, zIndex: 30,
+      background: 'radial-gradient(ellipse at center, rgba(255,71,87,.18) 0%, rgba(5,11,22,.97) 70%)',
+      backdropFilter: 'blur(8px)',
+      display: 'flex', flexDirection: 'column',
+      alignItems: 'center', justifyContent: 'center',
+      padding: 24, animation: 'mfs-fadein .25s ease-out',
+    }}>
+      <div style={{
+        width: 96, height: 96, borderRadius: '50%',
+        background: 'rgba(255,71,87,.18)',
+        border: '2px solid rgba(255,71,87,.5)',
+        display: 'flex', alignItems: 'center', justifyContent: 'center',
+        color: '#ff4757', marginBottom: 24,
+        animation: 'mfs-pulse-big 1.6s ease-out infinite',
+      }}>
+        <G width="48" height="48" />
+      </div>
+      <style>{`@keyframes mfs-pulse-big {
+        0%,100% { box-shadow: 0 0 0 0 rgba(255,71,87,.5); }
+        50% { box-shadow: 0 0 0 22px rgba(255,71,87,0); }
+      }`}</style>
+      <div style={{
+        fontSize: 10, fontWeight: 700, letterSpacing: '.18em',
+        color: '#ff4757', textTransform: 'uppercase',
+        fontFamily: 'JetBrains Mono, monospace',
+      }}>● caught in the act</div>
+      <div style={{
+        fontSize: 22, fontWeight: 600, color: '#fff',
+        marginTop: 10, textAlign: 'center', letterSpacing: '-0.01em',
+      }}>{alert.app}</div>
+      <div style={{
+        fontSize: 14, color: 'rgba(255,255,255,.7)', marginTop: 4, textAlign: 'center',
+      }}>is silently using your {meta.label.toLowerCase()}</div>
+      <div style={{ display: 'flex', gap: 10, marginTop: 28, width: '100%' }}>
+        <button onClick={onDismiss} style={{
+          flex: 1, padding: '13px', borderRadius: 12,
+          background: 'rgba(255,255,255,.08)', border: '1px solid rgba(255,255,255,.12)',
+          color: '#fff', fontSize: 14, fontWeight: 600, cursor: 'pointer',
+          fontFamily: 'inherit',
+        }}>Dismiss</button>
+        <button onClick={onTap} style={{
+          flex: 1, padding: '13px', borderRadius: 12,
+          background: '#ff4757', border: 0,
+          color: '#fff', fontSize: 14, fontWeight: 600, cursor: 'pointer',
+          fontFamily: 'inherit',
+        }}>Inspect</button>
+      </div>
+    </div>
+  );
+}
+
+function StatusbarAlert({ alert }) {
+  const meta = SENSORS[alert.sensor];
+  return (
+    <div style={{
+      position: 'absolute', top: 6, left: '50%', transform: 'translateX(-50%)',
+      zIndex: 20,
+      padding: '4px 10px 4px 8px', borderRadius: 100,
+      background: 'rgba(255,71,87,.95)',
+      color: '#fff',
+      fontSize: 10, fontWeight: 700, letterSpacing: '.08em',
+      fontFamily: 'JetBrains Mono, monospace',
+      display: 'flex', alignItems: 'center', gap: 6,
+      animation: 'mfs-fadein .3s ease-out',
+    }}>
+      <span style={{
+        width: 6, height: 6, borderRadius: '50%', background: '#fff',
+        animation: 'mfs-blink 1s ease-in-out infinite',
+      }} />
+      {meta.label.toUpperCase()} · {alert.app}
+    </div>
+  );
+}
+
+// ── scaling stage ───────────────────────────────────────────────────────────
+function fitStage() {
+  const stage = document.getElementById('stage');
+  const root = document.getElementById('root');
+  if (!root.firstChild) return;
+  const w = 412, h = 892;
+  const sx = (window.innerWidth - 40) / w;
+  const sy = (window.innerHeight - 40) / h;
+  const s = Math.min(1, sx, sy);
+  root.style.transform = `scale(${s})`;
+  root.style.transformOrigin = 'center center';
+}
+window.addEventListener('resize', fitStage);
+
+const ready = () => typeof AndroidDevice !== 'undefined' && typeof Dashboard !== 'undefined' &&
+                    typeof TweaksPanel !== 'undefined' && typeof AlertBubble !== 'undefined' &&
+                    typeof Onboarding !== 'undefined';
+function start() {
+  if (!ready()) return setTimeout(start, 30);
+  ReactDOM.createRoot(document.getElementById('root')).render(<PhoneSecApp />);
+  setTimeout(fitStage, 60);
+}
+start();
+</script>
+</body>
+</html>

@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<title>PhoneSec — Privacy Policy</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet" />
+<style>
+  html, body { margin: 0; background: #050b16; color: #e8f0ff;
+    font-family: 'Inter', system-ui, sans-serif; -webkit-font-smoothing: antialiased; }
+  .wrap { max-width: 760px; margin: 0 auto; padding: 64px 28px 120px; }
+  .badge { display: inline-block; padding: 4px 10px; border-radius: 100px;
+    font: 700 10px/1 'JetBrains Mono', monospace; letter-spacing: .12em; text-transform: uppercase;
+    background: rgba(61,240,255,.14); color: #3df0ff; border: 1px solid rgba(61,240,255,.3); }
+  h1 { font-size: 38px; font-weight: 700; letter-spacing: -.02em; margin: 16px 0 6px; }
+  .meta { font: 11px/1.4 'JetBrains Mono', monospace; color: rgba(232,240,255,.45);
+    letter-spacing: .06em; text-transform: uppercase; }
+  h2 { font-size: 18px; font-weight: 600; margin: 40px 0 10px;
+    padding-top: 24px; border-top: 1px solid rgba(255,255,255,.08); letter-spacing: -.01em; }
+  h2:first-of-type { border-top: 0; padding-top: 0; }
+  p, li { color: rgba(232,240,255,.78); line-height: 1.65; font-size: 14px; }
+  ul { padding-left: 22px; }
+  strong { color: #e8f0ff; }
+  code { font-family: 'JetBrains Mono', monospace; font-size: 12.5px;
+    background: rgba(61,240,255,.1); color: #3df0ff; padding: 2px 6px; border-radius: 4px; }
+  .promise { background: rgba(61,240,168,.06); border: 1px solid rgba(61,240,168,.25);
+    border-radius: 12px; padding: 18px 20px; margin: 24px 0; }
+  .promise b { color: #3df0a8; font: 700 11px/1.4 'JetBrains Mono', monospace;
+    letter-spacing: .14em; text-transform: uppercase; }
+  table { width: 100%; border-collapse: collapse; font-size: 13px; margin: 8px 0; }
+  th, td { text-align: left; padding: 10px 12px; border-bottom: 1px solid rgba(255,255,255,.08); }
+  th { font: 700 10px/1.4 'JetBrains Mono', monospace; letter-spacing: .08em;
+    text-transform: uppercase; color: rgba(232,240,255,.55); }
+  td { color: rgba(232,240,255,.78); vertical-align: top; }
+  td:first-child { color: #3df0ff; font-family: 'JetBrains Mono', monospace; white-space: nowrap; }
+  a { color: #3df0ff; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <span class="badge">● Privacy Policy</span>
+  <h1>PhoneSec</h1>
+  <div class="meta">Effective May 4, 2026 · Version 1.0</div>
+
+  <div class="promise">
+    <b>The short version</b>
+    <p style="margin: 8px 0 0">PhoneSec runs entirely on your device. We do not collect, transmit, sell, or share any of your data. There are no accounts, no servers, no analytics, and no advertising.</p>
+  </div>
+
+  <h2>1. Who we are</h2>
+  <p>PhoneSec ("we", "us") is the developer of the PhoneSec Android application (the "App"). You can reach us at <strong>[YOUR_EMAIL]</strong>. Mailing address: <strong>[YOUR_ADDRESS]</strong>.</p>
+
+  <h2>2. What the App does</h2>
+  <p>The App monitors which other applications installed on your Android device access your phone's input devices — microphone, camera, location (GPS), keyboard, Wi-Fi, and Bluetooth — and shows you a real-time dashboard, an activity history, and an alert when an app accesses an input device while running in the background.</p>
+
+  <h2>3. Information we access on your device</h2>
+  <p>To do its job, the App reads the following information <strong>locally on your device only</strong>:</p>
+  <table>
+    <thead><tr><th>Data</th><th>Why</th><th>Where it goes</th></tr></thead>
+    <tbody>
+      <tr><td>Installed apps</td><td>To list apps and show their permissions</td><td>Stays on device</td></tr>
+      <tr><td>Permission usage events (mic, cam, location, etc.)</td><td>To build the activity feed and risk score</td><td>Stays on device</td></tr>
+      <tr><td>App foreground / background state</td><td>To detect background access</td><td>Stays on device</td></tr>
+      <tr><td>Wi-Fi / Bluetooth scan events</td><td>To attribute scans to apps</td><td>Stays on device</td></tr>
+      <tr><td>User preferences (alert style, density, theme)</td><td>To remember your settings</td><td>Stays on device</td></tr>
+    </tbody>
+  </table>
+
+  <h2>4. What we do NOT collect</h2>
+  <ul>
+    <li>We do <strong>not</strong> read the contents of your microphone, camera, files, messages, contacts, photos, or keystrokes.</li>
+    <li>We do <strong>not</strong> create user accounts.</li>
+    <li>We do <strong>not</strong> use any third-party analytics, crash reporters, or advertising SDKs.</li>
+    <li>We do <strong>not</strong> transmit any data off your device to any server we control or any third party.</li>
+    <li>We do <strong>not</strong> sell, rent, or share your information.</li>
+  </ul>
+
+  <h2>5. Permissions we request</h2>
+  <table>
+    <thead><tr><th>Permission</th><th>Purpose</th></tr></thead>
+    <tbody>
+      <tr><td>PACKAGE_USAGE_STATS</td><td>See which apps used the microphone, camera, location, etc.</td></tr>
+      <tr><td>SYSTEM_ALERT_WINDOW</td><td>Show the floating alert bubble over other apps</td></tr>
+      <tr><td>POST_NOTIFICATIONS</td><td>Deliver alerts when an app is caught accessing a sensor</td></tr>
+      <tr><td>FOREGROUND_SERVICE</td><td>Keep monitoring active in the background</td></tr>
+      <tr><td>QUERY_ALL_PACKAGES</td><td>Enumerate installed apps to monitor them</td></tr>
+      <tr><td>ACCESS_WIFI_STATE / BLUETOOTH_CONNECT</td><td>Detect Wi-Fi and Bluetooth scans by other apps</td></tr>
+    </tbody>
+  </table>
+  <p>You can revoke any permission from <strong>Settings → Apps → PhoneSec → Permissions</strong> at any time. The App will continue to function for any feature whose permission has not been revoked.</p>
+
+  <h2>6. Data storage and retention</h2>
+  <p>All data is stored in a local database on your device. Activity events are automatically deleted after <strong>30 days</strong>. Uninstalling the App removes everything immediately. There is no backup of phonesec data to Google or to us.</p>
+
+  <h2>7. Your rights</h2>
+  <p>Because we never receive your data, there is nothing for us to access, correct, export, or delete on your behalf. You control everything by interacting with the App or uninstalling it. Under GDPR (EEA/UK), CCPA (California) and similar regulations, you nonetheless have the right to contact us about your privacy at <strong>[YOUR_EMAIL]</strong>.</p>
+
+  <h2>8. Children</h2>
+  <p>The App is not directed to children under 13 (or the equivalent minimum age in your jurisdiction). We do not knowingly collect data from children — and as noted, we do not collect data from anyone.</p>
+
+  <h2>9. Security</h2>
+  <p>The local database is private to the App's sandbox per Android's standard app isolation. We recommend keeping your device locked, your OS updated, and Play Protect enabled.</p>
+
+  <h2>10. Third parties</h2>
+  <p>The App contains <strong>no</strong> third-party SDKs, trackers, advertising libraries, or analytics. The only external party involved in distribution is Google Play, governed by Google's own privacy policy.</p>
+
+  <h2>11. Changes to this policy</h2>
+  <p>If we materially change this policy, we will update the "Effective" date above and surface the change in-app before it takes effect. Past versions are available on request.</p>
+
+  <h2>12. Contact</h2>
+  <p>Questions or complaints: <strong>[YOUR_EMAIL]</strong>. We reply within 30 days.</p>
+
+  <p style="margin-top:48px; font: 11px/1.4 'JetBrains Mono', monospace; color: rgba(232,240,255,.4); letter-spacing:.06em">
+    Boilerplate provided as a starting point — review with a lawyer before publishing.<br/>
+    Replace [YOUR_EMAIL] and [YOUR_ADDRESS] with real values. Host on a public URL and link from your Play listing.
+  </p>
+</div>
+</body>
+</html>

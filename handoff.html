@@ -1,0 +1,275 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>PhoneSec — Developer Handoff</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet" />
+<style>
+  :root {
+    --bg: #050b16; --bg1: #0a1628; --fg: #e8f0ff; --mute: rgba(232,240,255,.55);
+    --accent: #3df0ff; --warn: #ffb547; --danger: #ff4757; --ok: #3df0a8;
+    --border: rgba(255,255,255,.08);
+  }
+  html, body { margin: 0; background: var(--bg); color: var(--fg);
+    font-family: 'Inter', system-ui, sans-serif; -webkit-font-smoothing: antialiased; }
+  .wrap { max-width: 880px; margin: 0 auto; padding: 64px 32px 120px; }
+  .mono { font-family: 'JetBrains Mono', ui-monospace, monospace; }
+  h1 { font-size: 44px; font-weight: 700; letter-spacing: -.02em; margin: 0 0 8px; line-height: 1.05; }
+  h2 { font-size: 22px; font-weight: 600; letter-spacing: -.01em; margin: 56px 0 16px;
+    padding-top: 28px; border-top: 1px solid var(--border); }
+  h2:first-of-type { border-top: 0; padding-top: 0; }
+  h3 { font-size: 15px; font-weight: 600; margin: 24px 0 8px; }
+  p, li { color: rgba(232,240,255,.75); line-height: 1.6; font-size: 14px; }
+  code, .kbd { font-family: 'JetBrains Mono', monospace; font-size: 12.5px;
+    padding: 2px 6px; border-radius: 4px; background: rgba(61,240,255,.1); color: #3df0ff; }
+  pre { background: rgba(255,255,255,.025); border: 1px solid var(--border);
+    border-radius: 10px; padding: 14px 16px; overflow: auto; font-size: 12.5px;
+    color: rgba(232,240,255,.85); line-height: 1.55; }
+  pre code { background: transparent; padding: 0; color: inherit; }
+  .badge { display: inline-block; padding: 4px 10px; border-radius: 100px;
+    font-size: 10px; font-weight: 700; letter-spacing: .12em; text-transform: uppercase;
+    font-family: 'JetBrains Mono', monospace;
+    background: rgba(61,240,255,.14); color: var(--accent); border: 1px solid rgba(61,240,255,.3); }
+  .grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+  .card { background: rgba(255,255,255,.025); border: 1px solid var(--border);
+    border-radius: 12px; padding: 16px; }
+  .card h3 { margin-top: 0; }
+  .tag { display: inline-block; padding: 2px 8px; border-radius: 4px;
+    background: rgba(255,255,255,.06); color: var(--mute);
+    font-family: 'JetBrains Mono', monospace; font-size: 11px;
+    margin-right: 6px; margin-bottom: 4px; }
+  table { width: 100%; border-collapse: collapse; font-size: 13px; }
+  th, td { text-align: left; padding: 10px 12px; border-bottom: 1px solid var(--border); }
+  th { font-weight: 600; color: var(--fg); font-size: 11px; letter-spacing: .08em;
+    text-transform: uppercase; font-family: 'JetBrains Mono', monospace; color: var(--mute); }
+  td { color: rgba(232,240,255,.78); vertical-align: top; }
+  td:first-child { font-family: 'JetBrains Mono', monospace; color: var(--accent); white-space: nowrap; }
+  .swatch { display: inline-block; width: 12px; height: 12px; border-radius: 3px; margin-right: 8px;
+    vertical-align: middle; border: 1px solid rgba(255,255,255,.1); }
+  ul { padding-left: 20px; }
+  .lead { font-size: 17px; color: rgba(232,240,255,.7); line-height: 1.55; max-width: 640px; }
+  hr { border: 0; border-top: 1px solid var(--border); margin: 40px 0; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <span class="badge">Developer Handoff</span>
+  <h1 style="margin-top:18px">PhoneSec</h1>
+  <p class="lead">Privacy watchdog for Android. Detects which apps access your microphone, camera, location, keyboard, Wi-Fi and Bluetooth — and surfaces silent background access via a floating chat-head alert.</p>
+
+  <h2>1. Architecture</h2>
+  <div class="grid2">
+    <div class="card">
+      <h3>Stack</h3>
+      <ul>
+        <li><b>Kotlin</b> + <b>Jetpack Compose</b></li>
+        <li>Material 3, edge-to-edge</li>
+        <li>Min SDK 30 (Android 11), Target SDK 34</li>
+        <li>Room (local-only event log)</li>
+        <li>Foreground Service for monitoring</li>
+        <li>Bubble API for chat-head alerts</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h3>Modules</h3>
+      <ul>
+        <li><code>:app</code> — UI, screens, Compose</li>
+        <li><code>:data</code> — Room, repositories</li>
+        <li><code>:monitor</code> — AppOps polling, foreground service</li>
+        <li><code>:design</code> — tokens, components, icons</li>
+      </ul>
+    </div>
+  </div>
+
+  <h2>2. Required Android APIs</h2>
+  <table>
+    <thead><tr><th>API</th><th>Used for</th><th>Permission</th></tr></thead>
+    <tbody>
+      <tr><td>AppOpsManager</td><td>Per-app permission usage history (mic / cam / location)</td><td><code>PACKAGE_USAGE_STATS</code></td></tr>
+      <tr><td>PackageManager</td><td>List installed apps + their declared permissions</td><td>built-in</td></tr>
+      <tr><td>UsageStatsManager</td><td>Foreground/background detection per app</td><td><code>PACKAGE_USAGE_STATS</code></td></tr>
+      <tr><td>SensorPrivacyManager</td><td>Hardware mic/cam toggle state (Android 12+)</td><td>—</td></tr>
+      <tr><td>BubbleMetadata</td><td>Floating chat-head alert</td><td><code>SYSTEM_ALERT_WINDOW</code></td></tr>
+      <tr><td>NotificationManager</td><td>Alert channel + sound + vibe</td><td><code>POST_NOTIFICATIONS</code></td></tr>
+      <tr><td>WifiManager / BluetoothManager</td><td>Detect scans by other apps</td><td><code>ACCESS_WIFI_STATE</code> · <code>BLUETOOTH_CONNECT</code></td></tr>
+      <tr><td>ConnectivityManager</td><td>Outbound network from monitored apps</td><td><code>ACCESS_NETWORK_STATE</code></td></tr>
+    </tbody>
+  </table>
+  <p style="margin-top:14px">Usage Access (<code>PACKAGE_USAGE_STATS</code>) is a <b>special permission</b> — granted via <i>Settings → Special app access → Usage access</i>, not a runtime dialog. Onboarding step 3 must deep-link there with <code>Intent(ACTION_USAGE_ACCESS_SETTINGS)</code>.</p>
+
+  <h2>3. Design Tokens</h2>
+  <h3>Color (dark theme)</h3>
+  <table>
+    <tbody>
+      <tr><td><span class="swatch" style="background:#050b16"></span>bg.0</td><td><code>#050B16</code></td><td>App background</td></tr>
+      <tr><td><span class="swatch" style="background:#0a1628"></span>bg.1</td><td><code>#0A1628</code></td><td>Surface gradient top</td></tr>
+      <tr><td><span class="swatch" style="background:#e8f0ff"></span>fg</td><td><code>#E8F0FF</code></td><td>Primary text</td></tr>
+      <tr><td><span class="swatch" style="background:#3df0ff"></span>accent.cyan</td><td><code>#3DF0FF</code></td><td>Primary accent, brand</td></tr>
+      <tr><td><span class="swatch" style="background:#3df0a8"></span>risk.safe</td><td><code>#3DF0A8</code></td><td>Safe pill</td></tr>
+      <tr><td><span class="swatch" style="background:#ffb547"></span>risk.warn</td><td><code>#FFB547</code></td><td>Warn pill</td></tr>
+      <tr><td><span class="swatch" style="background:#ff4757"></span>risk.danger</td><td><code>#FF4757</code></td><td>Danger pill, alert bubble</td></tr>
+    </tbody>
+  </table>
+
+  <h3>Type</h3>
+  <table>
+    <tbody>
+      <tr><td>display.lg</td><td>Inter 600 · 26/30 · −0.02em</td><td>Onboarding titles</td></tr>
+      <tr><td>title.md</td><td>Inter 600 · 17/22 · −0.01em</td><td>Top bar, app name</td></tr>
+      <tr><td>body</td><td>Inter 400 · 13/20</td><td>Default</td></tr>
+      <tr><td>caption</td><td>JetBrains Mono 500 · 11/16 · +0.04em</td><td>Timestamps, labels, data</td></tr>
+      <tr><td>data.lg</td><td>JetBrains Mono 600 · 38/40 · −0.02em</td><td>Score readout</td></tr>
+      <tr><td>label.eyebrow</td><td>JetBrains Mono 700 · 10 · UPPERCASE +0.16em</td><td>Section eyebrows</td></tr>
+    </tbody>
+  </table>
+
+  <h3>Spacing & radii</h3>
+  <p><span class="tag">4 · 8 · 12 · 16 · 20 · 24 · 32</span> — base scale.<br />
+  <span class="tag">radius.sm 8</span> <span class="tag">radius.md 12</span> <span class="tag">radius.lg 14</span> <span class="tag">radius.xl 18</span> <span class="tag">radius.pill 100</span></p>
+
+  <h2>4. Screens</h2>
+  <table>
+    <thead><tr><th>Route</th><th>Screen</th><th>State</th></tr></thead>
+    <tbody>
+      <tr><td>/onboarding</td><td>3-step onboarding</td><td>page index, granted bool</td></tr>
+      <tr><td>/home</td><td>Dashboard (privacy index, sensors, live feed, flagged)</td><td>live events stream</td></tr>
+      <tr><td>/apps</td><td>App list w/ search + sort + sensor filter</td><td>query, sort, filter</td></tr>
+      <tr><td>/apps/{id}</td><td>App detail (heatmap + timeline)</td><td>app id route param</td></tr>
+      <tr><td>/feed</td><td>Activity feed (all events)</td><td>—</td></tr>
+      <tr><td>/history</td><td>Threat history (7d incidents)</td><td>day groups</td></tr>
+      <tr><td>/settings/notifications</td><td>Notification settings</td><td>local prefs</td></tr>
+      <tr><td>/you</td><td>Profile + entry to settings</td><td>—</td></tr>
+    </tbody>
+  </table>
+
+  <h2>5. Data Model</h2>
+<pre><code>// MonitoredApp
+data class MonitoredApp(
+  val id: String,            // package name
+  val name: String,
+  val iconBitmap: Bitmap,
+  val permissions: List&lt;Sensor&gt;,
+  val risk: Risk,            // SAFE | WARN | DANGER
+  val accesses24h: Int,
+  val backgroundPct: Int,    // 0..100
+  val installedAt: Instant,
+  val lastAccessAt: Instant,
+)
+
+enum class Sensor { MIC, CAM, GPS, KEYBOARD, WIFI, BLUETOOTH }
+enum class Risk { SAFE, WARN, DANGER }
+
+// AccessEvent (Room entity)
+@Entity(tableName = "access_events")
+data class AccessEvent(
+  @PrimaryKey(autoGenerate=true) val rowId: Long = 0,
+  val packageName: String,
+  val sensor: Sensor,
+  val startedAt: Instant,
+  val endedAt: Instant?,         // null while live
+  val foreground: Boolean,
+  val durationMs: Long?,
+)
+</code></pre>
+
+  <h2>6. Risk Scoring</h2>
+  <p>Computed per app on every monitor tick. Pure function, easy to unit test.</p>
+<pre><code>fun risk(app: MonitoredApp, recent: List&lt;AccessEvent&gt;): Risk {
+  val bgAccess = recent.count { it.packageName == app.id &amp;&amp; !it.foreground }
+  val sensitiveBg = recent.any {
+    it.packageName == app.id &amp;&amp; !it.foreground &amp;&amp;
+    it.sensor in setOf(MIC, CAM, GPS)
+  }
+  return when {
+    sensitiveBg &amp;&amp; bgAccess &gt;= 5 -&gt; DANGER
+    bgAccess &gt;= 3 || sensitiveBg -&gt; WARN
+    else -&gt; SAFE
+  }
+}</code></pre>
+
+  <h2>7. Privacy Index</h2>
+  <p>Single 0–100 score on the dashboard ring. Weight by sensor severity:</p>
+<pre><code>privacyIndex =
+  100
+  − 4  × (number of DANGER apps)
+  − 1  × (number of WARN apps)
+  − 0.5× (background mic/cam events in last 24h)
+  clamped to [0, 100]</code></pre>
+
+  <h2>8. The Hero Moment — Floating Bubble</h2>
+  <p>Use Android's <b>Bubble API</b> (Notification + BubbleMetadata, API 30+).
+  Anchor it to a <code>BUBBLE_PREFERRED</code> notification channel with high importance.
+  Tapping opens <code>AppDetailActivity</code> with the offending package as extra.
+  Pulse + radar animation only inside the in-app preview; the actual system bubble
+  uses the OS chrome.</p>
+
+  <h2>9. Foreground Service</h2>
+  <p>Required so the monitor survives Doze. Type:
+    <code>FOREGROUND_SERVICE_DATA_SYNC</code> + a low-importance "Watching apps" channel.
+    Polls AppOpsManager every 10s; emits <code>AccessEvent</code>s into Room.
+    Battery budget target: &lt; 1%/hr.</p>
+
+  <h2>10. Onboarding Permission Flow</h2>
+  <ol>
+    <li><b>Step 1</b> — pure marketing slide</li>
+    <li><b>Step 2</b> — pure marketing slide</li>
+    <li><b>Step 3</b> — CTA button launches <code>ACTION_USAGE_ACCESS_SETTINGS</code>.
+      On return, check <code>AppOpsManager.checkOpNoThrow(OPSTR_GET_USAGE_STATS, ...)</code>.
+      If denied, show inline error and offer retry.</li>
+    <li>After grant: also request <code>POST_NOTIFICATIONS</code> + <code>SYSTEM_ALERT_WINDOW</code>.</li>
+  </ol>
+
+  <h2>11. Acceptance Criteria</h2>
+  <ul>
+    <li>Bubble appears within 2s of any background mic/cam access.</li>
+    <li>App list scrolls 60fps with 250+ apps.</li>
+    <li>Battery usage in normal monitoring: ≤ 2%/24h.</li>
+    <li>All UI works offline — no network calls in v1.</li>
+    <li>Event log auto-prunes &gt; 30 days.</li>
+    <li>No analytics, no telemetry — privacy promise.</li>
+  </ul>
+
+  <h2>12. File Map</h2>
+<pre><code>com/phonesec/
+  ui/
+    HomeScreen.kt          → /home
+    AppListScreen.kt       → /apps
+    AppDetailScreen.kt     → /apps/{id}
+    FeedScreen.kt          → /feed
+    HistoryScreen.kt       → /history
+    YouScreen.kt           → /you
+    NotificationSettings.kt
+    OnboardingScreen.kt
+    components/
+      RiskPill.kt
+      SensorChip.kt
+      ScoreRing.kt
+      AppGlyph.kt
+      AlertBubble.kt   (preview only)
+  data/
+    Db.kt
+    AppRepo.kt
+    EventRepo.kt
+  monitor/
+    MonitorService.kt    (foreground)
+    AppOpsPoller.kt
+    BubbleAlerter.kt
+  design/
+    Color.kt   Type.kt   Theme.kt   Icons.kt</code></pre>
+
+  <h2>13. Open Questions for PM</h2>
+  <ul>
+    <li>Does v1 ship "auto-block"? Note: blocking another app's permission requires Device Admin or root; recommend deferring.</li>
+    <li>Pricing — free vs. Sentinel Pro? If pro: what's gated?</li>
+    <li>Family / multi-device sync — explicitly out of scope for v1?</li>
+    <li>Localization — launch en-US only?</li>
+  </ul>
+
+  <hr />
+  <p class="mono" style="font-size:11px; color: var(--mute); letter-spacing:.06em">
+    handoff v1 · phonesec.html prototype as visual source of truth · 2026-05-04
+  </p>
+</div>
+</body>
+</html>
